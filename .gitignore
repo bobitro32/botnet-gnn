@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+data/
+*.pdf
+*.docx
+*.csv
+*.tar.bz2
