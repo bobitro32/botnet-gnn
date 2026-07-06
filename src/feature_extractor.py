@@ -14,3 +14,10 @@ def _degree_features(G: nx.DiGraph) -> dict:
         }
 
     return features
+
+def _pagerank_features(G: nx.DiGraph) -> dict:
+    """Изчислява PageRank за всеки възел."""
+    pagerank = nx.pagerank(G)
+
+    return {node: {'pagerank': round(score, 8)}
+            for node, score in pagerank.items()}
