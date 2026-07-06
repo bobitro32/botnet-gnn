@@ -21,3 +21,42 @@ def _pagerank_features(G: nx.DiGraph) -> dict:
 
     return {node: {'pagerank': round(score, 8)}
             for node, score in pagerank.items()}
+
+def _betweenness_features(G: nx.DiGraph) -> dict:
+    """Изчислява betweenness centrality за всеки възел."""
+    betweenness = nx.betweenness_centrality(G, k=500)
+
+    return {node: {'betweenness': round(score, 8)}
+            for node, score in betweenness.items()}
+
+
+def extract_features(G: nx.DiGraph) -> pd.DataFrame:
+    """
+    Извлича всички графови метрики за всеки възел.
+
+    Args:
+        G: насочен граф от build_graph()
+
+    Returns:
+        DataFrame с features за всеки IP възел
+    """
+    print("Извличане на features...")
+
+    degree      = _degree_features(G)
+    pagerank    = _pagerank_features(G)
+    betweenness = _betweenness_features(G)
+
+    rows = []
+    for node in G.nodes():
+        rows.append({
+            'ip':          node,
+            'in_degree':   degree[node]['in_degree'],
+            'out_degree':  degree[node]['out_degree'],
+            'pagerank':    pagerank[node]['pagerank'],
+            'betweenness': betweenness[node]['betweenness'],
+            'is_botnet':   G.nodes[node]['is_botnet'],
+        })
+
+    df = pd.DataFrame(rows)
+    print(f"Features извлечени за {len(df):,} възела")
+    return df
