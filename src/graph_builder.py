@@ -1,24 +1,24 @@
 import networkx as nx
 import pandas as pd 
 def _build_edges(G: nx.DiGraph, df: pd.DataFrame) -> nx.DiGraph:
-    """Добавя ребра от DataFrame към графа."""
-    for _, row in df.iterrows():
-        src = row['SrcAddr']
-        dst = row['DstAddr']
+    """Добавя ребра от DataFrame към графа — оптимизирана версия."""
+    
+    # Агрегирай ВСИЧКО наведнъж с pandas (бързо!)
+    edges_agg = df.groupby(['SrcAddr', 'DstAddr']).agg(
+        flow_count  = ('SrcAddr', 'count'),
+        total_bytes = ('TotBytes', 'sum'),
+        total_pkts  = ('TotPkts', 'sum'),
+        avg_dur     = ('Dur', 'mean'),
+    ).reset_index()
 
-        if G.has_edge(src, dst):
-            # Реброто вече съществува — агрегирай
-            G[src][dst]['flow_count']  += 1
-            G[src][dst]['total_bytes'] += row['TotBytes']
-            G[src][dst]['total_pkts']  += row['TotPkts']
-        else:
-            # Ново ребро
-            G.add_edge(src, dst,
-                flow_count  = 1,
-                total_bytes = row['TotBytes'],
-                total_pkts  = row['TotPkts'],
-                avg_dur     = row['Dur'],
-            )
+    # Добави ребрата от готовата таблица (бързо!)
+    for row in edges_agg.itertuples(index=False):
+        G.add_edge(row.SrcAddr, row.DstAddr,
+            flow_count  = row.flow_count,
+            total_bytes = row.total_bytes,
+            total_pkts  = row.total_pkts,
+            avg_dur     = row.avg_dur,
+        )
 
     return G
 
