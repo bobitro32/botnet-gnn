@@ -1,7 +1,7 @@
 from data_loader import load_ctu13
 from graph_builder import build_graph
 from feature_extractor import extract_features
-from model import _split_data, _train_model
+from model import _split_data, _train_model, _evaluate_model
 df = load_ctu13('/Users/bobitro/Desktop/Desktop/GraduationProject/botnet-gnn/data/CTU-13-Dataset/1/capture20110810.binetflow')
 df_small = df.sample(n=100_000, random_state=42)
 
@@ -14,7 +14,5 @@ print(f"\nБотнет възли: {features_df['is_botnet'].sum()}")
 
 X_train, X_test, y_train, y_test = _split_data(features_df)
 model = _train_model(X_train, y_train)
-
-print(f"\nМодел тип: {type(model).__name__}")
-print(f"Брой дървета: {model.n_estimators}")
+y_pred = _evaluate_model(model, X_test, y_test)
 

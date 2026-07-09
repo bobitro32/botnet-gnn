@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
 
 
 def _split_data(features_df: pd.DataFrame):
@@ -33,3 +35,15 @@ def _train_model(X_train, y_train) -> RandomForestClassifier:
     print("Модел обучен!")
 
     return model
+
+def _evaluate_model(model: RandomForestClassifier, X_test, y_test):
+    """Оценява модела върху test данните."""
+    y_pred = model.predict(X_test)
+
+    print("\n=== Classification Report ===")
+    print(classification_report(y_test, y_pred, target_names=['Normal', 'Botnet']))
+
+    print("=== Confusion Matrix ===")
+    print(confusion_matrix(y_test, y_pred))
+
+    return y_pred
