@@ -20,3 +20,36 @@ class BotnetGNN(nn.Module):
         x = self.conv2(x, edge_index)
 
         return F.log_softmax(x, dim=1)
+
+def _create_masks(num_nodes: int, train_ratio: float = 0.8):
+    '''Създава train/test маски за GNN обучение.'''
+    indices = torch.randperm(num_nodes)
+    train_size = int(num_nodes * train_ratio)
+
+    train_mask = torch.zeros(num_nodes, dtype=torch.bool)
+    test_mask = torch.zeros(num_nodes, dtype=torch.bool)
+
+    train_mask[indices[:train_size]] = True
+    test_mask[indices[train_size:]] = True
+
+    return train_mask, test_mask
+
+def train_gnn(model: BotnetGNN, data, train_mask, epochs: int = 100, lr: float = 0.01):
+    """Обучава GNN модела."""
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    model.train()
+
+    for epoch in range(epochs):
+        optimizer.zero_grad()
+
+        out = model(data.x, data.edge_index)
+        loss = F.nll_loss(out[train_mask], data.y[train_mask])
+
+        loss.backward()
+        optimizer.step()
+
+        if epoch % 10 == 0:
+            print(f"Epoch {epoch:3d}  Loss: {loss.item():.4f}")
+
+    return model
