@@ -3,6 +3,7 @@ from graph_builder import build_graph
 from feature_extractor import extract_features
 from model import _split_data, _train_model, _evaluate_model
 from gnn_dataset import build_pyg_data
+from model_gnn import BotnetGNN
 
 df = load_ctu13('/Users/bobitro/Desktop/Desktop/GraduationProject/botnet-gnn/data/CTU-13-Dataset/1/capture20110810.binetflow')
 '''G = build_graph(df)
@@ -21,3 +22,11 @@ pyg_data = build_pyg_data(G_small, features_df_small)
 print(f"\nx shape: {pyg_data.x.shape}")
 print(f"edge_index shape: {pyg_data.edge_index.shape}")
 print(f"y shape: {pyg_data.y.shape}")
+
+gnn_model = BotnetGNN(in_channels=4, hidden_channels=32, out_channels=2)
+
+print(gnn_model)
+
+# Тестово forward pass с нашите PyG данни
+output = gnn_model(pyg_data.x, pyg_data.edge_index)
+print(f"\nOutput shape: {output.shape}")
