@@ -24,6 +24,7 @@ class BotnetGNN(nn.Module):
 
 def _create_masks(num_nodes: int, train_ratio: float = 0.8):
     '''Създава train/test маски за GNN обучение.'''
+    torch.manual_seed(42)
     indices = torch.randperm(num_nodes)
     train_size = int(num_nodes * train_ratio)
 
@@ -42,8 +43,9 @@ def train_gnn(model: BotnetGNN, data, train_mask, epochs: int = 100, lr: float =
     # Изчисли тегла — по-рядкият клас получава по-висока тежест
     y_train = data.y[train_mask]
     class_counts = torch.bincount(y_train)
-    class_weights = 1.0 / class_counts.float()
-    class_weights = class_weights / class_weights.sum() * 2  # нормализирай
+    class_weights = torch.sqrt(1.0 / class_counts.float())
+    class_weights = class_weights / class_weights.sum() * 1.3  # 
+    print(f"DEBUG: multiplier used = 1.3") 
 
     print(f"Class weights: Normal={class_weights[0]:.4f}, Botnet={class_weights[1]:.4f}")
 

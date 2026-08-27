@@ -5,7 +5,8 @@ from model import _split_data, _train_model, _evaluate_model
 from gnn_dataset import build_pyg_data
 from model_gnn import BotnetGNN, _create_masks, train_gnn
 from model_gnn import evaluate_gnn
-
+import torch
+torch.manual_seed(42)
 df = load_ctu13('/Users/bobitro/Desktop/Desktop/GraduationProject/botnet-gnn/data/CTU-13-Dataset/1/capture20110810.binetflow')
 '''G = build_graph(df)
 features_df = extract_features(G)
